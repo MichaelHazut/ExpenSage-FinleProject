@@ -1,0 +1,33 @@
+
+#addExpenseContainer{
+    padding: 0;
+    min-width: fit-content;
+}
+#addExpenseContainer > form > div:nth-child(1) {
+    grid-column: 1;
+}
+
+#addExpenseContainer > form > div:nth-child(2) {
+    grid-column: 2;
+
+}
+
+#addExpenseContainer > form > div:nth-child(3) {
+    grid-column: 3;
+}
+.expenseGroup > *{
+    height: 24px;
+}
+option{
+    height: 24px;
+    font-size: 1rem;
+    text-align: justify;
+    margin: 0;
+    padding: 0;
+}
+#formSelect{
+    padding: 0;
+    text-align: center;
+}
+
+

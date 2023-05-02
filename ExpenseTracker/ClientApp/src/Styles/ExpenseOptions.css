@@ -1,0 +1,7 @@
+.options-container{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    background-color: burlywood;
+    text-align: center;
+}
