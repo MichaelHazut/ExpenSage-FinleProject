@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Dal;
 using ExpenseTracker.Models;
+using System.Security.Cryptography;
+using Microsoft.Build.Execution;
 
 namespace ExpenseTracker.Controllers
 {
@@ -21,7 +23,6 @@ namespace ExpenseTracker.Controllers
             _context = context;
         }
 
-        // GET: api/Users
         //Return A List Of All Users From The Database
         [HttpGet("get-users")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
@@ -33,69 +34,32 @@ namespace ExpenseTracker.Controllers
             return await _context.Users.ToListAsync();
         }
 
-        // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        [HttpPost("login")]
+        public async Task<ActionResult<User>> Login(LoginModel model)
         {
-            if (_context.Users == null)
-            {
-                return NotFound();
-            }
-            var user = await _context.Users.FindAsync(id);
-
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
             if (user == null)
             {
-                return NotFound();
+                return BadRequest(new { success = false, message = "User not found" });
             }
 
-            return user;
+            if (user.Password != model.Password)
+            {
+                return BadRequest(new { success = false, message = "Invalid password." });
+            }
+            return Ok(new { success = true, user});
         }
-        //public async Task<ActionResult<User>> GetUser(string email, string password)
-        //{
-        //    return new User();
-        //}
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
 
         // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        [HttpPost()]
         public async Task<ActionResult<User>> PostUser(User user)
         {
             if (_context.Users == null)
             {
                 return Problem("Entity set 'ExpenseTrackerDbContext.Users'  is null.");
             }
-            
+
             //Check If Email Already Exists
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (existingUser != null)

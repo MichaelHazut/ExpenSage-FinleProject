@@ -21,33 +21,37 @@ namespace ExpenseTracker.Controllers
             _context = context;
         }
 
-        // GET: api/Expenses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
+        public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses(int userId)
         {
           if (_context.Expenses == null)
           {
               return NotFound();
           }
-            return await _context.Expenses.ToListAsync();
+          var expenses = await _context.Expenses.Where(e => e.UserId == userId).ToListAsync();
+          return expenses;
         }
 
-        // GET: api/Expenses/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Expense>> GetExpense(int id)
+
+        [HttpPost]
+        public async Task<ActionResult> PostExpense(Expense expense)
         {
-          if (_context.Expenses == null)
-          {
-              return NotFound();
-          }
-            var expense = await _context.Expenses.FindAsync(id);
+            var hello = ModelState.IsValid;
+            if(_context.Expenses == null )
+            {
+                return Problem("Entity set 'ExpenseTrackerDbContext.Expenses'  is null.");
+            }
 
             if (expense == null)
             {
-                return NotFound();
+                return BadRequest("Expense cannot be null");
             }
 
-            return expense;
+            _context.Expenses.Add(expense);
+            
+            await _context.SaveChangesAsync();
+            return Ok(new {success = true, expense});
+
         }
 
         // PUT: api/Expenses/5
@@ -83,18 +87,18 @@ namespace ExpenseTracker.Controllers
 
         // POST: api/Expenses
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Expense>> PostExpense(Expense expense)
-        {
-          if (_context.Expenses == null)
-          {
-              return Problem("Entity set 'ExpenseTrackerDbContext.Expenses'  is null.");
-          }
-            _context.Expenses.Add(expense);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Expense>> PostExpense(Expense expense)
+        //{
+        //  if (_context.Expenses == null)
+        //  {
+        //      return Problem("Entity set 'ExpenseTrackerDbContext.Expenses'  is null.");
+        //  }
+        //    _context.Expenses.Add(expense);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetExpense", new { id = expense.Id }, expense);
-        }
+        //    return CreatedAtAction("GetExpense", new { id = expense.Id }, expense);
+        //}
 
         // DELETE: api/Expenses/5
         [HttpDelete("{id}")]

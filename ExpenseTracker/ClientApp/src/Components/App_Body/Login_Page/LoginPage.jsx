@@ -2,35 +2,54 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
 
-import { useRef, useState } from 'react';
-import { useNavigate  } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import './LoginPage.css'
 import { ToasterSuccess, ToasterWarn } from '../../Toaster';
 import { UserLoggin } from '../../../Helpers/UsersHandler/UserLoging';
 import { checkIfUserExist } from '../../../Helpers/UsersHandler/CheckIfExist';
+import usePostFetch from '../../../Hooks/usePostFetch';
 
-export function LoginPage({setIsAuthenticated}) {
+export function LoginPage({ setIsAuthenticated, setLoggedUser }) {
+
+    const navigate = useNavigate();
     var email = useRef();
     var password = useRef();
+
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
+
+    const [triggerFetch, setTriggerFetch] = useState(false);
+    const [userData, setUserData] = useState(null);
+    const { data, error} = usePostFetch('https://localhost:7077/api/users/login', userData, triggerFetch);
 
     function handlePasswordVisibilityChange(event) {
         setShowPassword(event.target.checked);
     }
 
     function handleSubmit(e) {
-        const response = checkIfUserExist(email.current.value)
-        if (response !== true) {
-            ToasterWarn("User Not Found");
-            return;
-        }
-        UserLoggin(setIsAuthenticated);
-        ToasterSuccess('Login Successful');
+        e.preventDefault();
+        setUserData({
+            email: email.current.value,
+            password: password.current.value
+        })
+        setTriggerFetch(true);
         navigate('/myExpenses');
-
     }
+    useEffect(() => {
+        if (data) {
+            setIsAuthenticated(true);
+            setLoggedUser(data.user);
+            setTriggerFetch(false);
+            ToasterSuccess('Logged In Successfully');
+        }
+    }, [data]);
+    useEffect(() => {
+        if(error){
+            ToasterWarn(error);
+        }
+    }, [error]);
+    
     return (
         <div className='LoginPage'>
 

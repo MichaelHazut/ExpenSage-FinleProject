@@ -7,6 +7,7 @@ namespace ExpenseTracker.Models
     public class User
     {
 
+        public int Id { get; set; }
         [Required]
         [EmailAddress]
         [Index("IX_Email", IsUnique = true)]
@@ -20,7 +21,6 @@ namespace ExpenseTracker.Models
         [StringLength(100, MinimumLength = 2)]
         public string? Name{ get; set; }
 
-        public int Id { get; set; }
         public ICollection<Expense>? Expenses{ get; set; } = new List<Expense>();
 
         public bool IsStayLoggedIn { get; set; }

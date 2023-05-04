@@ -8,9 +8,10 @@ import { useState } from "react";
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useSessionStorage('isAuthenticated', false);
-    const [loggedUser, setLoggedUser] = useState(null);
-    useInactivityTimeout(20, () => {
+    const [loggedUser, setLoggedUser] = useSessionStorage('loggedUser', null);
+    useInactivityTimeout(30, () => {
         setIsAuthenticated(false);
+        setLoggedUser(null);
     });
 
     return (

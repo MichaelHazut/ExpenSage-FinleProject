@@ -11,10 +11,12 @@ export function ExpensesPage({ loggedUser }) {
   const [expenses, setExpenses] = useState([]);
   const [initAddExpense, setInitAddExpense] = useState(false);
   const [mySort, setMySort] = useState(() => (a, b) => b.price - a.price);
+ 
   console.log(loggedUser);
   useEffect(() => {
     ReadExpense(setExpenses)
   }, []);
+  
   return (
     <div className="ExpensesPage">
       <h3>My Expenses</h3>
@@ -30,4 +32,3 @@ export function ExpensesPage({ loggedUser }) {
     </div>
   )
 }
-

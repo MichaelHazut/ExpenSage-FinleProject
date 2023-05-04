@@ -15,9 +15,10 @@ const usePostFetch = (url, postData = {}, triggerFetch) => {
           },
           body: JSON.stringify(postData),
         });
-
         if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
+          var resJson = await response.json();
+          setError(resJson.message || '');
+          throw new Error(`Error: ${response.status} : ${resJson.message || ''}`);
         }
 
         if (response.status === 204) {
@@ -28,7 +29,6 @@ const usePostFetch = (url, postData = {}, triggerFetch) => {
           console.log(result);
         }
       } catch (err) {
-        setError(err.message);
         console.log(err.message);
       } finally {
         setIsLoading(false);
@@ -42,27 +42,3 @@ const usePostFetch = (url, postData = {}, triggerFetch) => {
 };
 
 export default usePostFetch;
-
-// }, []);
-// fetch(url, {
-//     method: 'POST',
-//     headers: {
-//         'Content-Type': 'application/json',
-//     },
-//     body: JSON.stringify(data),
-// })
-//     .then((response) => {
-//         if (!response.ok) {
-//             return response.text().then((text) => {
-//                 throw new Error(text);
-//             });
-//         }
-//         return response.json();
-//     }
-//     )
-//     .then((data) => {
-//         console.log(data);
-//     })
-//     .catch((error) => {
-//         console.error('There has been a problem with your post operation:', error);
-//     });

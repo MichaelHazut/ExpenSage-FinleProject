@@ -13,14 +13,15 @@ export function Router({ props }) {
         <Routes>
             <Route path={myRoutes.HOME} element={<HomePage />} />
             <Route path={myRoutes.SIGNUP} element={<SignUpPage {...props} />} />
-            <Route path={myRoutes.LOGIN} element={<LoginPage setIsAuthenticated={props.setIsAuthenticated} />} />
-            <Route path={myRoutes.LOGOUT} element={<UserLogout setIsAuthenticated={props.setIsAuthenticated} />} />
+            <Route path={myRoutes.LOGIN} element={<LoginPage {...props} />} />
+            <Route path={myRoutes.LOGOUT} element={<UserLogout {...props} />} />
             {props.isAuthenticated ?
                 <Route path={myRoutes.EXPENSES} element={<ExpensesPage loggedUser={props.loggedUser} />} /> :
-                <Route path={myRoutes.EXPENSES} element={<LoginPage setIsAuthenticated={props.setIsAuthenticated} />} />}
+                <Route path={myRoutes.EXPENSES} element={<LoginPage {...props} />} />}
             <Route path="*" element={<HomePage />} />
             
-            <Route path={myRoutes.TESTPAGE} element={<TestPage />} />
+            {/* A Test Component to be removed */}
+            <Route path={myRoutes.TESTPAGE} element={<TestPage {...props}/>} />
         </Routes>
     );
 };

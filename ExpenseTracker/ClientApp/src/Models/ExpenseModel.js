@@ -3,8 +3,8 @@ import User from "./UserClass";
 
 class Expense{
     constructor(props){
+        console.log(props);
         this.state = {
-            id: props.id || null ,
             user: props.user,
             userId: props.user.id,
             category: props.category,
