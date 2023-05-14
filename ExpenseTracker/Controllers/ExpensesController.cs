@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Dal;
 using ExpenseTracker.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace ExpenseTracker.Controllers
 {
@@ -24,20 +26,22 @@ namespace ExpenseTracker.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses(int userId)
         {
-          if (_context.Expenses == null)
-          {
-              return NotFound();
-          }
-          var expenses = await _context.Expenses.Where(e => e.UserId == userId).ToListAsync();
-          return expenses;
+            if (_context.Expenses == null || userId == 0)
+            {
+                return NotFound();
+            }
+            var expenses = await _context.Expenses.Where(e => e.UserId == userId).ToListAsync();
+            return expenses;
         }
 
 
         [HttpPost]
         public async Task<ActionResult> PostExpense(Expense expense)
         {
-            var hello = ModelState.IsValid;
-            if(_context.Expenses == null )
+            //Get a referance to the user for DB
+            var user = await _context.Users.FindAsync(expense.UserId);
+
+            if (_context.Expenses == null)
             {
                 return Problem("Entity set 'ExpenseTrackerDbContext.Expenses'  is null.");
             }
@@ -47,11 +51,20 @@ namespace ExpenseTracker.Controllers
                 return BadRequest("Expense cannot be null");
             }
 
-            _context.Expenses.Add(expense);
-            
-            await _context.SaveChangesAsync();
-            return Ok(new {success = true, expense});
+            expense.User = user; 
 
+            _context.Expenses.Add(expense); 
+
+            await _context.SaveChangesAsync();
+
+            //Serialize json to prevent circular references
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            var json = JsonSerializer.Serialize(new { success = true, expense }, options);
+            return Ok(json);
         }
 
         // PUT: api/Expenses/5
@@ -85,30 +98,14 @@ namespace ExpenseTracker.Controllers
             return NoContent();
         }
 
-        // POST: api/Expenses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Expense>> PostExpense(Expense expense)
-        //{
-        //  if (_context.Expenses == null)
-        //  {
-        //      return Problem("Entity set 'ExpenseTrackerDbContext.Expenses'  is null.");
-        //  }
-        //    _context.Expenses.Add(expense);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction("GetExpense", new { id = expense.Id }, expense);
-        //}
-
-        // DELETE: api/Expenses/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteExpense(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteExpense(int expenseId)
         {
             if (_context.Expenses == null)
             {
                 return NotFound();
             }
-            var expense = await _context.Expenses.FindAsync(id);
+            var expense = await _context.Expenses.FindAsync(expenseId);
             if (expense == null)
             {
                 return NotFound();
@@ -117,7 +114,7 @@ namespace ExpenseTracker.Controllers
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool ExpenseExists(int id)

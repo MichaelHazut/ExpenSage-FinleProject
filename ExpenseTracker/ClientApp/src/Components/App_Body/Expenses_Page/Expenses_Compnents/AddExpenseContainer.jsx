@@ -1,13 +1,17 @@
 import '../../../../Styles/AddExpenseButton.css'
+import Button from 'react-bootstrap/Button';
 
 import { useState, useEffect } from "react";
 import { useRef } from 'react';
 import { AddExpenseForm } from './AddExpenseForm';
+import apiUrls from '../../../../Data/ApiUrls';
+import usePostFetch from '../../../../Hooks/usePostFetch';
 
-import Button from 'react-bootstrap/Button';
+export function AddExpenseContainer({initAddExpense, setInitAddExpense, SetExpenses, loggedUser }) {
 
-export function AddExpenseContainer({ initExpense: initAddExpense, setInitExpense: setInitAddExpense, SetNewExpenses }) {
-
+    const [expenseData, setExpenseData] = useState(null);
+    const [triggerFetch, setTriggerFetch] = useState(false);
+    const { data, error, isLoading } = usePostFetch(apiUrls.postExpenses, expenseData, triggerFetch);
     const childComponentRef = useRef(null);
 
     const addExpenseClick = () => {
@@ -15,13 +19,20 @@ export function AddExpenseContainer({ initExpense: initAddExpense, setInitExpens
     };
 
     const saveExpenseButton = () => {
-        //Save To Local Storage
-        childComponentRef.current.saveExpense();
+        var newExpenses = childComponentRef.current.saveExpense();
 
-        const expenses = JSON.parse(localStorage.getItem('Expenses'));
-        SetNewExpenses(expenses);
+        SetExpenses(newExpenses);
         setInitAddExpense(!initAddExpense);
     };
+
+    useEffect(() => {
+        if (expenseData === null) return;
+        setTriggerFetch(true);
+    }, [expenseData]);
+    
+    useEffect(() => {
+        setTriggerFetch(false);
+    }, [data]);
 
     return (
         <>
@@ -41,7 +52,7 @@ export function AddExpenseContainer({ initExpense: initAddExpense, setInitExpens
             )}
 
             {initAddExpense ? (
-                <AddExpenseForm ref={childComponentRef} />
+                <AddExpenseForm ref={childComponentRef} loggedUser={loggedUser} setExpenseData={setExpenseData} />
             ) : null}
         </>
     );

@@ -13,17 +13,16 @@ import Expense from '../Models/ExpenseModel';
 import useFetch from '../Hooks/useFetch';
 import usePostFetch from '../Hooks/usePostFetch';
 import { getUser } from '../DAL/UserHandler';
-
+import apiUrls from '../Data/ApiUrls';
 
 export function TestPage({ loggedUser }) {
   const [optionVisability, setOptionVisability] = useState(true);
   const showOptions = () => setOptionVisability(!optionVisability)
 
   const [requestOptions, setRequestOptions] = useState(null);
-  //const { data, error, isLoading } = useFetch('https://localhost:7077/api/users/get-users', requestOptions);
   const [userData, setUserData] = useState(null);
-  const { data, error, isLoading } = usePostFetch('https://localhost:7077/api/expenses', userData);
-
+  const { data, isLoading, error } = useFetch(apiUrls.getExpenses + 1, {});
+  console.log(data);
   var date = useRef();
   const navigate = useNavigate();
 
@@ -75,7 +74,7 @@ export function TestPage({ loggedUser }) {
     const expenseProps = {
       user: loggedUser,
       category: 'Girldfriend',
-      title: 'First Post API Request',
+      title: '2nd weird Json Post API Request',
       currency: 'ILS',
       price: 420,
       date: '2021-08-01'

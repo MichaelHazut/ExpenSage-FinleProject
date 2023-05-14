@@ -2,7 +2,7 @@ import '../../../../Styles/ExpenseNav.css'
 
 import React, { useState, useEffect } from "react";
 
-export function ExpenseNav({ setSorting, currentSort }) {
+export function ExpenseHeaders({ setSorting, currentSort }) {
   const titleSort = () => (a, b) => a.title.localeCompare(b.title);
   const priceSort = () => (a, b) => {
     const currencyOrder = ["$", "₪"];

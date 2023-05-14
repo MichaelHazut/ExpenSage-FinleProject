@@ -17,9 +17,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigin",
         builder => builder.WithOrigins("https://localhost:44435")
-                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
                             .AllowAnyHeader());
 });
+
 builder.Services.AddControllersWithViews();
 
 

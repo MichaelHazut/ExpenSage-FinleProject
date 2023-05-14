@@ -1,4 +1,11 @@
+const baseUrl = "https://localhost:7077/api/"
 const apiUrls = {
-    getAllUser : 'https://localhost:7077/api/Users/get-users',
-    getUser : 'https://localhost:7077/api/Users/get-user'
+    getUser : baseUrl + 'Users/get-user',
+    getAllUser : baseUrl + 'Users/get-users',
+    postUserLogin : baseUrl + 'Users/login',
+    getExpenses : baseUrl + 'Expenses?userId=',
+    postExpenses : baseUrl + 'Expenses',
+    deleteExpense : baseUrl + 'Expenses?expenseId=',
 }
+
+export default apiUrls;

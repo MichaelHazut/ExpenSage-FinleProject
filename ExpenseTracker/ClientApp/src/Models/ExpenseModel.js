@@ -3,7 +3,6 @@ import User from "./UserClass";
 
 class Expense{
     constructor(props){
-        console.log(props);
         this.state = {
             user: props.user,
             userId: props.user.id,

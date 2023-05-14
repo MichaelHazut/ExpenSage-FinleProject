@@ -1,10 +1,10 @@
 import '../../../../Styles/Expense.css' 
 
 import { useState } from 'react'
-import { ExpenseOptions } from './ExpenseOptions'
+import { ExpenseDropDown } from './ExpenseDropDown'
 import Collapse from 'react-bootstrap/Collapse';
 
-export function Expense({ expense }) {
+export function Expense({ expense , splicer}) {
     const { title, price, date, currency, category } = expense;
     const [optionVisability, setOptionVisability] = useState(false);
     const showOptions = () => setOptionVisability(!optionVisability)
@@ -19,7 +19,7 @@ export function Expense({ expense }) {
             </div>
             <Collapse in={optionVisability}>
                 <div>
-                    <ExpenseOptions />
+                    <ExpenseDropDown expense={expense} splicer={splicer}/>
                 </div>
             </Collapse>
         </div>

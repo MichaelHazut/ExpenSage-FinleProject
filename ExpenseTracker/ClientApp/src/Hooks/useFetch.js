@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 
-const useFetch = (url, options = {}) => {
+const useFetch = (url, options = {}, triggerFetch) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if(!triggerFetch) return;
+
     const fetchData = async () => {
       try {
         const response = await fetch(url, options);
@@ -28,10 +30,9 @@ const useFetch = (url, options = {}) => {
     };
 
     fetchData();
-  }, [url, options]);
+  }, [url, options, triggerFetch]);
 
   return { data, error, isLoading };
 };
-
 
 export default useFetch;
