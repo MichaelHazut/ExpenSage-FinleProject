@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenSage", "ExpenseTracker\ExpenSage.csproj", "{B79EF7CD-92A1-475F-8918-EABC231117EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "..\..\..\..\..\..\source\repos\Expense_Tracker_WithAuthentication\DataAccessLayer\DataAccessLayer.csproj", "{C4D1807D-5416-4FE9-9D55-422480213A47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{6E363946-E7E6-4ADE-8451-DB0EC39F852A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{B79EF7CD-92A1-475F-8918-EABC231117EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B79EF7CD-92A1-475F-8918-EABC231117EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B79EF7CD-92A1-475F-8918-EABC231117EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4D1807D-5416-4FE9-9D55-422480213A47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4D1807D-5416-4FE9-9D55-422480213A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4D1807D-5416-4FE9-9D55-422480213A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4D1807D-5416-4FE9-9D55-422480213A47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E363946-E7E6-4ADE-8451-DB0EC39F852A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E363946-E7E6-4ADE-8451-DB0EC39F852A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E363946-E7E6-4ADE-8451-DB0EC39F852A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E363946-E7E6-4ADE-8451-DB0EC39F852A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,7 +3,6 @@ using DataAccessLayer.Models;
 using DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-//using ExpenseTracker.Dal;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
