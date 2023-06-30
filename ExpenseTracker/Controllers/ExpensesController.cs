@@ -114,7 +114,7 @@ namespace ExpenseTracker.Controllers
             _context.Expenses.Remove(expense);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok("Expense Deleted");
         }
 
         private bool ExpenseExists(int id)

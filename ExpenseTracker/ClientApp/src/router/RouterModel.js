@@ -4,7 +4,7 @@ const myRoutes = {
     LOGIN: '/login',
     LOGOUT: '/logout',
     SIGNUP: '/signUp',
-    EXPENSES: 'myExpenses',
+    EXPENSES: 'expenses',
     ABOUT: '/about',
     TESTPAGE:'/testpage'
 };

@@ -26,10 +26,8 @@ const usePostFetch = (url, postData = {}, triggerFetch) => {
         } else {
           const result = await response.json();
           setData(result);
-          console.log(result);
         }
       } catch (err) {
-        console.log(err.message);
       } finally {
         setIsLoading(false);
       }

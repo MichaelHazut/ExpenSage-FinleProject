@@ -6,7 +6,8 @@ class Expense{
         this.state = {
             user: props.user,
             userId: props.user.id,
-            category: props.category,
+            expenseCategory: { name :props.expenseCategory.name },
+            expenseCategoryId: props.expenseCategory.id,
             title: props.title ,
             currency: props.currency ,
             price: props.price ,

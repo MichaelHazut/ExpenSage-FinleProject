@@ -1,13 +1,18 @@
-const home = { name: 'Home'};
-const myExpenses = { name: 'My Expenses'};
-const login = { name: 'Login'};
-const logout = { name: 'Logout'};
-const signUp = { name: 'Sign Up'};
-const about = { name: 'About'};
+import HomeIcon from '@mui/icons-material/Home';
+import MoneyIcon from '@mui/icons-material/AttachMoney';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SignUpIcon from '@mui/icons-material/PersonAdd';
+import AboutIcon from '@mui/icons-material/Info';
 
-//need to remove after done testing
-const test_Page = {name: 'Test Page'}
+const home = { name: 'Home', icon: <HomeIcon/>};
+const myExpenses = { name: 'Expenses', icon: <MoneyIcon/>};
+const login = { name: 'Login', icon: <LoginIcon/>};
+const logout = { name: 'Logout', icon: <LogoutIcon/>};
+const signUp = { name: 'Sign Up', icon: <SignUpIcon />};
+const about = { name: 'About', icon: <AboutIcon/>};
 
-export const urlRouter = [home, about, login, logout, signUp, test_Page]
-export const loggedIn = [home, myExpenses, about, logout, test_Page]
-export const notLoggedIn = [home,  login, signUp, about, test_Page]
+
+export const urlRouter = [home, about, login, logout, signUp]
+export const loggedIn = [home, myExpenses, about, logout]
+export const notLoggedIn = [home,  login, signUp, about]

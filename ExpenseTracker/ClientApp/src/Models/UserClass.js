@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import useFetch from '../Hooks/useFetch';
-
 class User {
     constructor(props) {
         this.state = {
@@ -12,7 +9,6 @@ class User {
 
     addExpense(expense) {
         this.state.expenses.push(expense);
-        console.log(this.state.expenses);
     }
 }
 

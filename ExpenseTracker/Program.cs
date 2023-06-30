@@ -1,12 +1,28 @@
+using DataAccessLayer.DbContext;
+using DataAccessLayer.Models;
+using DataAccessLayer.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ExpenseTracker.Dal;
+//using ExpenseTracker.Dal;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddDbContext<ExpenseTrackerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<ExpenseTrackerDbContext>()
+    .AddDefaultTokenProviders()
+    .AddUserManager<UserManager<User>>()
+    .AddSignInManager<SignInManager<User>>();
+
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<ExpenseRepository>();
+builder.Services.AddScoped<CategoryRepository>();
+builder.Services.AddScoped<UserManager<User>>();
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -16,7 +32,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMyOrigin",
-        builder => builder.WithOrigins("https://localhost:44435")
+        builder => builder.WithOrigins("https://expensage.azurewebsites.net", "https://localhost:44435")
                             .AllowAnyMethod()
                             .AllowAnyHeader());
 });
@@ -26,7 +42,6 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

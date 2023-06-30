@@ -1,69 +1,56 @@
-import '../../../Styles/ExpensesPage.css'
-
-import { Expense } from './Expenses_Compnents/Expense'
-import { ExpenseHeaders } from './Expenses_Compnents/ExpenseHeaders'
-import { AddExpenseContainer } from './Expenses_Compnents/AddExpenseContainer';
-import { useState, useEffect } from 'react';
-import { ReadExpense } from '../../../DAL/ExpensesHandler';
-import useFetch from '../../../Hooks/useFetch';
+import { useEffect, useState } from 'react';
+import { Box, Typography, CircularProgress } from '@mui/material';
+import { Expense } from './Expense_Compnents/Expense';
+import { ExpenseHeaders } from './Expense_Compnents/ExpenseHeaders';
+import { CreateExpenseContainer } from './Expense_Create/CreateExpenseContainer';
+import { useFetchGet } from '../../../Hooks/useFetchGet';
 import apiUrls from '../../../Data/ApiUrls';
 
-export function ExpensesPage({ loggedUser }) {
-
-  const [expenses, setExpenses] = useState([]);
-  const [initAddExpense, setInitAddExpense] = useState(false);
-  const [mySort, setMySort] = useState(() => (a, b) => b.price - a.price);
-  const [triggerFetch, setTriggerFetch] = useState(false);
-  const [refreshTriger, setRefreshTriger] = useState([]);
-  let { data, isLoading, error } = useFetch(apiUrls.getExpenses + loggedUser.id, {}, triggerFetch);
-  //Set initial data
+const ExpensesPage = ({ loggedUser }) => {
+  const [expenses, setExpenses] = useState();
+  const [triggerFetch, setTriggerFetch] = useState(0);
+  const { response, error, isLoading, getFetch } = useFetchGet(apiUrls.getExpenses(loggedUser.id));
+  
   useEffect(() => {
-    if (data == null) {
-      setTriggerFetch(true)
-    } else {
-      setTriggerFetch(false)
-    }
-  }, [data])
-
-  //Refetching the data on new expense creation
+    getFetch();
+  }, [triggerFetch]);
+  
   useEffect(() => {
-    setTriggerFetch(true)
-  }, [expenses])
+    if(response){
+      setExpenses(response);
+    };
+  }, [response]);
+  
 
-  const splicer = (idToDelete) => {
-    data = data.filter(expense => expense.id !== idToDelete);
-  };
   return (
-    <div className="ExpensesPage">
+    <Box className="ExpensesPage" sx={{ p: 4, background: 'linear-gradient(to bottom, #4CAF50, #8BC34A, #C5E1A5, #FFFFFF)', }} >
+      <Typography variant="h3" gutterBottom>
+        My Expenses
+      </Typography>
 
-      <h3>My Expenses</h3>
-
-      <div className='expenseOptions'>
-        <AddExpenseContainer
+      <Box className="expenseOptions">
+        <CreateExpenseContainer
           loggedUser={loggedUser}
-          initAddExpense={initAddExpense}
-          setInitAddExpense={setInitAddExpense}
-          SetExpenses={setExpenses}
+          setTriggerFetch={setTriggerFetch}
         />
-      </div>
+      </Box>
 
-      <div className='expenses-container'>
-        <ExpenseHeaders
-          setSorting={setMySort}
-          currentSort={mySort}
-        />
+      <Box className="expenses-container" sx={{ background: 'white', borderRadius: '8px', p:2, backgroundColor: 'rgba(255, 255, 255, 0.5)', }}>
+        <ExpenseHeaders /*setSorting={/*setMySort} currentSort={mySort}*/ />
         {isLoading ? (
-          <div>Loading...</div>
-        ) : error ? (
-          <div>{error + ' | try reloading the page'}</div>
-        ) : (
-          data &&
-          data.sort(mySort).map((expense, index) => (
-            <Expense key={expense.title + index} expense={expense} splicer={splicer} />
-          ))
+          <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+            <CircularProgress thickness={5} size={60} />
+          </Box>) : error ? (
+            <Typography>{error + ' | try reloading the page'}</Typography>
+          ) : (
+            expenses &&
+            expenses.map((expense, index) => (
+              expense && <Expense key={expense.title + index} expense={expense} />
+            ))
         )}
-      </div>
+      </Box>
+    </Box>
+  );
+};
 
-    </div>
-  )
-}
+export default ExpensesPage;

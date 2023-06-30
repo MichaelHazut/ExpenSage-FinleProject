@@ -12,16 +12,16 @@ namespace ExpenseTracker.Models
         [EmailAddress]
         [Index("IX_Email", IsUnique = true)]
         public string? Email { get; set; }
-        
+
         [Required]
-        [StringLength(100, MinimumLength = 6)] 
+        [StringLength(100, MinimumLength = 6)]
         public string? Password { get; set; }
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
-        public string? Name{ get; set; }
+        public string? Name { get; set; }
 
-        public ICollection<Expense>? Expenses{ get; set; } = new List<Expense>();
+        public ICollection<Expense>? Expenses { get; set; } = new List<Expense>();
 
         public bool IsStayLoggedIn { get; set; }
 
