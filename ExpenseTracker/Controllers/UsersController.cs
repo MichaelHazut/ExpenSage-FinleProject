@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DataAccessLayer.Models;
+using DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ExpenseTracker.Dal;
-using ExpenseTracker.Models;
-using System.Security.Cryptography;
-using Microsoft.Build.Execution;
+using DataAccessLayer.Enums;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace ExpenseTracker.Controllers
 {
@@ -16,85 +13,139 @@ namespace ExpenseTracker.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ExpenseTrackerDbContext _context;
-
-        public UsersController(ExpenseTrackerDbContext context)
+        private readonly UserRepository _userRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        public UsersController(UserRepository userRepository, UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _context = context;
+            _userRepository = userRepository;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        //Return A List Of All Users From The Database
-        [HttpGet("get-users")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(string id)
         {
-            if (_context.Users == null)
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user == null)
             {
-                return new List<User> { new User("Michael1mic1@gmail.com", "!Aa123456", "Michael Hazut") };
+                return NotFound("User not found");
             }
-            return await _context.Users.ToListAsync();
-        }
 
+            // Return the user or appropriate response
+            return Ok(user);
+        }
+        
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] UserRegister user)
+        {
+            User newUser = new User(user);
+
+            var result = await _userManager.CreateAsync(newUser, user.Password);
+            if (result.Succeeded)
+            {
+                UserDTO userDTO = new UserDTO
+                {
+                    Id = newUser.Id,
+                    Name = newUser.Name,
+                    Email = newUser.NormalizedEmail!,
+                    AuthenticationLevel = newUser.AuthenticationLevel
+                };
+                return CreatedAtAction(nameof(GetUser), new { id = newUser.Id }, userDTO);
+            }
+            else
+            {
+                return BadRequest(result.Errors.Select(e => e.Description));
+            }
+        }
+        
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login(LoginModel model)
+        public async Task<IActionResult> Login([FromBody] UserLogin loginInfo)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
-            if (user == null)
+            string email = loginInfo.Email.ToUpperInvariant();
+            User? user = await _userManager.FindByNameAsync(email);
+
+            if(user == null)
             {
-                return BadRequest(new { success = false, message = "User not found" });
+                return NotFound(new { error = "User Not Found" });
+
             }
 
-            if (user.Password != model.Password)
+            SignInResult result = await _signInManager.PasswordSignInAsync(user, loginInfo.Password, true, false); 
+
+            if (!result.Succeeded)
             {
-                return BadRequest(new { success = false, message = "Invalid password." });
+                return Unauthorized(new { error = "Invalid email or password" });
             }
-            return Ok(new { success = true, user});
+
+            var userReturn = new UserDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.NormalizedEmail!,
+                AuthenticationLevel = user.AuthenticationLevel
+            };
+
+            return Ok(userReturn);
         }
 
-
-        // POST: api/Users
-        [HttpPost()]
-        public async Task<ActionResult<User>> PostUser(User user)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] User updatedUser)
         {
-            if (_context.Users == null)
+            if(updatedUser == null || updatedUser.Id != id) 
             {
-                return Problem("Entity set 'ExpenseTrackerDbContext.Users'  is null.");
+                return BadRequest("Updated User Dose Not Exist");
             }
-
-            //Check If Email Already Exists
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-            if (existingUser != null)
+            
+            var response = await _userRepository.UpdateUserAsync(id, updatedUser);
+            if(!response) 
             {
-                return BadRequest("Email already exists.");
+                return BadRequest("Error Has Been Accrued");
             }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
-        }
-
-        // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            if (_context.Users == null)
-            {
-                return NotFound();
-            }
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool UserExists(int id)
+        [HttpPut("{id}/changepassword")]
+        public async Task<IActionResult> ChangePassword(string userId, [FromBody] ChangePasswordModel model)
         {
-            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
+            if (model == null || model.UserId != userId || string.IsNullOrEmpty(model.OldPassword) || string.IsNullOrEmpty(model.NewPassword))
+            {
+                return BadRequest("Invalid change password request");
+            }
+            
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if(!changePasswordResult.Succeeded) 
+            {
+                return BadRequest("Failed to change password");
+            }
+            return NoContent();
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            
+            var result = await _userManager.DeleteAsync(user);
+            
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors.Select(e => e.Description));
+            }
+            return NoContent();
         }
     }
+    
 }

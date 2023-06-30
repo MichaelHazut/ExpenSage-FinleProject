@@ -53,11 +53,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\ExpensesController.cs" />
-    <Compile Remove="Controllers\UsersController.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\source\repos\Expense_Tracker_WithAuthentication\DataAccessLayer\DataAccessLayer.csproj" />
   </ItemGroup>
 

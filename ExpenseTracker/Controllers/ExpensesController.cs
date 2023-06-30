@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using DataAccessLayer.Models;
+using DataAccessLayer.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ExpenseTracker.Dal;
-using ExpenseTracker.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
@@ -16,110 +11,107 @@ namespace ExpenseTracker.Controllers
     [ApiController]
     public class ExpensesController : ControllerBase
     {
-        private readonly ExpenseTrackerDbContext _context;
-
-        public ExpensesController(ExpenseTrackerDbContext context)
+        private readonly ExpenseRepository _expenseRepository;
+        private readonly UserRepository _userRepository;
+        public ExpensesController(ExpenseRepository expenseRepository, UserRepository userRepository)
         {
-            _context = context;
+            _expenseRepository = expenseRepository;
+            _userRepository = userRepository;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses(int userId)
+
+
+        [HttpGet("expenses/{UserId}")]
+        public async Task<IActionResult> GetExpense(int expenseId)
         {
-            if (_context.Expenses == null || userId == 0)
+            var expense = await _expenseRepository.GetExpenseByIdAsync(expenseId);
+            if(expense == null)
             {
                 return NotFound();
             }
-            var expenses = await _context.Expenses.Where(e => e.UserId == userId).ToListAsync();
-            return expenses;
+
+            return Ok(expense);
         }
 
-
-        [HttpPost]
-        public async Task<ActionResult> PostExpense(Expense expense)
+        [HttpGet("users/{userId}/expenses")]
+        public async Task<IActionResult> GetExpensesList(string userId)
         {
-            //Get a referance to the user for DB
-            var user = await _context.Users.FindAsync(expense.UserId);
-
-            if (_context.Expenses == null)
+            var expenses = await _expenseRepository.GetExpenseByUserId(userId);
+            if(expenses == null)
             {
-                return Problem("Entity set 'ExpenseTrackerDbContext.Expenses'  is null.");
+                
+                return NotFound(new { error = "No Expenses Found" });
+            }
+            return Ok(expenses);
+        }
+
+        [HttpPost("users/{userId}/expenses")]
+        public async Task<IActionResult> PostExpense([FromBody] Expense expense)
+        {
+            if(expense == null)
+            {
+                return BadRequest(new { error = "Expense Is Empty" });
             }
 
-            if (expense == null)
+            var user = await _userRepository.GetUserByIdAsync(expense.UserId);
+
+            if (user == null)
             {
-                return BadRequest("Expense cannot be null");
+                return NotFound(new { error = "User Not Found" });
             }
 
-            expense.User = user; 
+            expense.User = user;
 
-            _context.Expenses.Add(expense); 
+            var response = await _expenseRepository.CreateExpenseAsync(expense);
 
-            await _context.SaveChangesAsync();
+            if (!response)
+            {
+                return BadRequest(new { error = "Error Has Been Accrued" });
+            }
 
-            //Serialize json to prevent circular references
+            var newExpense = new ExpenseDTO(expense);
+
             var options = new JsonSerializerOptions
             {
-                ReferenceHandler = ReferenceHandler.Preserve
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                WriteIndented = true
             };
 
-            var json = JsonSerializer.Serialize(new { success = true, expense }, options);
-            return Ok(json);
+            var serializedExpense = JsonSerializer.Serialize(expense, options);
+            return CreatedAtAction(nameof(GetExpense), new { expenseId = expense.Id }, newExpense);
+
         }
 
-        // PUT: api/Expenses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutExpense(int id, Expense expense)
+        [HttpPut("users/{userId}/expenses/{expenseId}")]
+        public async Task<IActionResult> UpdateExpense(int id, [FromBody] Expense updatedExpense)
         {
-            if (id != expense.Id)
+            if (updatedExpense == null || id != updatedExpense.Id)
             {
-                return BadRequest();
+                return BadRequest("New Expense Dose Not Exist");
             }
 
-            _context.Entry(expense).State = EntityState.Modified;
-
-            try
+            var response = await _expenseRepository.UpdateExpenseAsync(id, updatedExpense);
+            
+            if (!response)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ExpenseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest("Error Has Been Accrued");
             }
 
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("users/{userId}/expenses/{expenseId}")]
         public async Task<IActionResult> DeleteExpense(int expenseId)
         {
-            if (_context.Expenses == null)
+            var response = await _expenseRepository.DeleteExpenseAsync(expenseId);
+            
+            if (!response)
             {
-                return NotFound();
-            }
-            var expense = await _context.Expenses.FindAsync(expenseId);
-            if (expense == null)
-            {
-                return NotFound();
+                return BadRequest("Error Has Been Accrued");
             }
 
-            _context.Expenses.Remove(expense);
-            await _context.SaveChangesAsync();
-
-            return Ok("Expense Deleted");
-        }
-
-        private bool ExpenseExists(int id)
-        {
-            return (_context.Expenses?.Any(e => e.Id == id)).GetValueOrDefault();
+            return NoContent();
         }
     }
 }
+
