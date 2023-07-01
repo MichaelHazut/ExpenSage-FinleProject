@@ -1,4 +1,3 @@
-
 export function CheckUserInput(email, password, fullName) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {

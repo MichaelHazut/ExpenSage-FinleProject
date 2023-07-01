@@ -6,7 +6,6 @@ const myRoutes = {
     SIGNUP: '/signUp',
     EXPENSES: 'expenses',
     ABOUT: '/about',
-    TESTPAGE:'/testpage'
 };
 
 export default myRoutes;

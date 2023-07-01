@@ -1,4 +1,4 @@
-import { Box, Collapse, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 
 

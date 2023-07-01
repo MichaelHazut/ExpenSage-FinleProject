@@ -1,11 +1,12 @@
+import React, { useState, useImperativeHandle, useEffect } from 'react';
+
 import { useFetchGet } from '../../../../Hooks/useFetchGet';
 import { useFetchPost } from '../../../../Hooks/useFetchPost';
-import React, { useState, useImperativeHandle, useEffect } from 'react';
-import { Box, Button, Grid, InputAdornment, MenuItem, Select, TextField } from '@mui/material';
-import Expense from '../../../../Models/ExpenseModel';
-import CloseIcon from '@mui/icons-material/Close';
 
+import { BoxContainer, GridContainer, GridItem, CategoryTextFields, SelectCategory, TitleTextField, CategoryBox, PriceTextField, DateTextField } from '../../../../Styles/ExpenseFormDesign';
+import Expense from '../../../../Models/ExpenseModel';
 import apiUrls from '../../../../Data/ApiUrls';
+
 
 export const CreateExpenseForm = React.forwardRef(({ loggedUser, initAddExpense, fetchPostExpense }, ref) => {
 
@@ -103,124 +104,51 @@ export const CreateExpenseForm = React.forwardRef(({ loggedUser, initAddExpense,
   return (
     <>
       {initAddExpense ? (
-
-        <Box
-          sx={{
-            backgroundColor: '#D0F5E2',
-            border: '1px solid #ccc',
-            borderRadius: '5px',
-            mb: 1,
-          }}>
-          <Grid
-            container
-            spacing={1}
-            alignItems="center"
-            justifyContent="space-between"
-            width="100%"
-            sx={{
-              borderRadius: '4px',
-              padding: '16px',
-              maxWidth: 1200,
-              margin: '0 auto',
-              overflow: 'hidden',
-            }}
-          >
-            <Grid item xs={12} sm={6} md={3}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: 'white' }}>
+        <BoxContainer>
+          <GridContainer>
+            <GridItem>
+              <CategoryBox>
                 {addCategory ? (
-                  <TextField
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label={addCategory ? 'New Category' : 'Category'}
-                    placeholder="Add Category"
+                  <CategoryTextFields
+                    label={addCategory}
                     value={categoryValue}
-                    onChange={(e) => setCategoryValue(e.target.value)}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <Button onClick={() => setAddCategory(false)}>
-                            <CloseIcon />
-                          </Button>
-                        </InputAdornment>
-                      ),
-                      inputProps: { min: '0', step: '0.01' },
-                    }}
-                    fullWidth
+                    onChange={setCategoryValue}
+                    setAddCategory={setAddCategory}
                   />
                 ) : (
-                  <Select
-                    id="formSelect"
-                    onChange={initCategoryCreation}
-                    value={String(categoryIndex)}
-                    size="small"
-                    displayEmpty
-                    renderValue={() => (categoryIndex === 0 ? 'Select Category' : categories[categoryIndex])}
-                    fullWidth
-                  >
-                    <MenuItem value='' disabled>
-                      Select Category
-                    </MenuItem>
-                    {categories.map((category, i) => (
-                      <MenuItem value={String(i)} key={category + i}>
-                        {category}
-                      </MenuItem>
-                    ))}
-                    <MenuItem value={-1}>
-                      Add New
-                    </MenuItem>
-                  </Select>
+                  <SelectCategory
+                  categoryIndex={categoryIndex}
+                  initCategoryCreation={initCategoryCreation}
+                  categories={categories}
+                  />
                 )}
-              </Box>
-            </Grid>
+              </CategoryBox>
+            </GridItem>
 
-            <Grid item xs={12} sm={6} md={3}  >
-              <TextField
-                label="Title"
-                variant="outlined"
-                size="small"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                fullWidth
-                sx={{ backgroundColor: 'white' }}
+            <GridItem>
+              <TitleTextField
+                title={title}
+                setTitle={setTitle}
               />
-            </Grid>
+            </GridItem>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                onChange={(e) => setPrice(e.target.value)}
-                label="Price"
-                variant="outlined"
-                size="small"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Button variant="body2" onClick={changeCurrency} sx={{ px: 1, minWidth: 0 }}>
-                        {currencies[currencyIndex]}
-                      </Button>
-                    </InputAdornment>
-                  ),
-                  inputProps: { min: '0', step: '0.01' },
-                }}
-                fullWidth
-                sx={{ backgroundColor: 'white' }}
+            <GridItem>
+              <PriceTextField
+                setPrice={setPrice}
+                changeCurrency={changeCurrency}
+                currencies={currencies}
+                currencyIndex={currencyIndex}
               />
-            </Grid>
+            </GridItem>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <TextField
-                label="Date"
-                onChange={(e) => setDate(e.target.value)}
-                type="date"
-                variant="outlined"
-                size="small"
-                value={date}
-                fullWidth
-                sx={{ backgroundColor: 'white' }}
+            <GridItem>
+              <DateTextField
+                setDate={setDate}
+                date={date}
               />
-            </Grid>
-          </Grid>
-        </Box>
+            </GridItem>
+          </GridContainer>
+        </BoxContainer>
       ) : <></>}
     </>
   );

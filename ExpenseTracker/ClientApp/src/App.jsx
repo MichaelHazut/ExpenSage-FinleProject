@@ -8,7 +8,6 @@ import { useInactivityTimeout } from "./Helpers/SessionHandler/useInactivityTime
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { TestPage } from "./Tests/TestPage";
 
 const theme = createTheme({
   palette: {
@@ -32,7 +31,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useSessionStorage('isAuthenticated', false);
   const [loggedUser, setLoggedUser] = useSessionStorage('loggedUser', null);
   useInactivityTimeout(30, () => {
-    //add move to login page
     setIsAuthenticated(false);
     setLoggedUser(null);
   });

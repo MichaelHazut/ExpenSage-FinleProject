@@ -4,7 +4,6 @@ import { SignUpPage } from '../Components/App_Body/SignUp_Page/SignUpPage';
 import { LoginPage } from '../Components/App_Body/Login_Page/LoginPage';
 import ExpensesPage  from '../Components/App_Body/Expenses_Page/ExpensesPage';
 import { UserLogout } from '../Helpers/UsersHandler/UserLoging';
-import { TestPage } from '../Tests/TestPage';
 import myRoutes from './RouterModel';
 
 

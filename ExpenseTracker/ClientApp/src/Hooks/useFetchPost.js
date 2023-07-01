@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export function useFetchPost(url) {
   const [postResponse, setPostResponse] = useState(null);

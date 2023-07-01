@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Collapse, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { BoxContainer, GridContainer, RowContainer, BreakText, Category, Description } from './DesignComponents';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { BoxContainer, GridContainer, RowContainer, BreakText, Category, Description } from '../../../../Styles/ExpenseDesign';
 
 
 export function Expense({ expense }) {
