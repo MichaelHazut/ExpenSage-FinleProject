@@ -29,7 +29,7 @@ git clone --recurse-submodules https://github.com/MichaelHazut/ExpenSage-FinlePr
 * Open 'appsettings.json' and locate the 'ConnectionStrings' section.
 * Replace the '{YoureServerName}' placeholder in the 'DefaultConnection' string with your server name. For example:
 ```json
-"DefaultConnection": "Server=LocalServer;Database=ExpenseTrackerDb;Trusted_Connection=True;TrustServerCertificate=true;"
+"DefaultConnection": "Server={YoureServerName};Database=ExpenseTrackerDb;Trusted_Connection=True;TrustServerCertificate=true;"
 ```
 
 3. Run Database Migration:
